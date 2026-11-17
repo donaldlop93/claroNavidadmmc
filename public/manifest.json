@@ -1,0 +1,22 @@
+{
+  "name": "El Reto Navideño Claro 2026 — M&M Comunicaciones",
+  "short_name": "Reto Navideño",
+  "description": "Consulta de Avance PDR (Zona Norte) - Reto Navideño Claro 2026",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#DA291C",
+  "theme_color": "#DA291C",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logos/claro-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logos/claro-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

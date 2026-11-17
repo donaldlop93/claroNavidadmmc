@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --claro-red: #DA291C;
+    --claro-dark-red: #B91C1C;
+    --claro-deep-red: #7F1D1D;
+    --christmas-gold: #FBBF24;
+    --christmas-gold-dark: #D97706;
+    --christmas-pine: #14532D;
+    --whatsapp-green: #25D366;
+  }
+
+  body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+}
+
+/* Festive Candy Cane / Ribbon Border */
+.festive-ribbon-border {
+  border-top: 5px solid transparent;
+  border-image: repeating-linear-gradient(
+    -45deg,
+    #DA291C 0,
+    #DA291C 15px,
+    #FFFFFF 15px,
+    #FFFFFF 25px,
+    #FBBF24 25px,
+    #FBBF24 35px,
+    #FFFFFF 35px,
+    #FFFFFF 45px
+  ) 5;
+}
+
+/* Shimmer Effect for high progress bars (> 80%) */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 2s infinite ease-in-out;
+}
+
+/* Christmas Bauble Gentle Swing */
+@keyframes ornament-swing {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(4deg);
+  }
+  75% {
+    transform: rotate(-4deg);
+  }
+}
+
+.animate-swing {
+  transform-origin: top center;
+  animation: ornament-swing 3.5s ease-in-out infinite;
+}
+
+.animate-swing-delay {
+  transform-origin: top center;
+  animation: ornament-swing 4.2s ease-in-out infinite 0.7s;
+}
+
+/* Snowfall Keyframes */
+@keyframes snowfall {
+  0% {
+    transform: translateY(-20px) translateX(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(105vh) translateX(25px);
+    opacity: 0;
+  }
+}
+
+.snowflake {
+  position: fixed;
+  top: -20px;
+  color: white;
+  user-select: none;
+  pointer-events: none;
+  z-index: 15;
+  animation-name: snowfall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Subtle pulse for classified badge */
+@keyframes golden-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.85);
+  }
+}
+
+.golden-glow {
+  animation: golden-glow 2.5s ease-in-out infinite;
+}
