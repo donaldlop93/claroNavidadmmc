@@ -505,8 +505,27 @@ export async function getPdrData(): Promise<{ records: PosRecord[]; classifiedCo
 
   let loadedRecords: PosRecord[] | null = null;
 
-  // 1. Try Service Account
-  if (saEmail && saKey) {
+  // 1. Try Public CSV or Custom URL (Easiest and most direct method)
+  if (csvUrl) {
+    try {
+      const res = await fetch(csvUrl, { next: { revalidate: 60 } });
+      if (res.ok) {
+        const text = await res.text();
+        // Check if response is actually CSV and not an HTML error page
+        if (!text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
+          loadedRecords = parseCsvRows(text, simMode);
+          if (loadedRecords.length > 0) {
+            console.log(`Successfully loaded ${loadedRecords.length} records via CSV URL.`);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Error fetching via CSV URL:', err);
+    }
+  }
+
+  // 2. Try Service Account
+  if (!loadedRecords && saEmail && saKey) {
     try {
       const token = await getGoogleAuthToken(saEmail, saKey);
       if (token) {
@@ -517,7 +536,7 @@ export async function getPdrData(): Promise<{ records: PosRecord[]; classifiedCo
     }
   }
 
-  // 2. Try API Key
+  // 3. Try API Key
   if (!loadedRecords && apiKey) {
     try {
       loadedRecords = await fetchViaGoogleApi(sheetId, tabName, { key: apiKey }, simMode);
@@ -526,16 +545,19 @@ export async function getPdrData(): Promise<{ records: PosRecord[]; classifiedCo
     }
   }
 
-  // 3. Try Public CSV or Custom URL
-  if (!loadedRecords && csvUrl) {
+  // 4. Try automatic public Google Sheets CSV export
+  if (!loadedRecords && sheetId) {
     try {
-      const res = await fetch(csvUrl, { next: { revalidate: 60 } });
+      const directCsvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
+      const res = await fetch(directCsvUrl, { next: { revalidate: 60 } });
       if (res.ok) {
         const text = await res.text();
-        loadedRecords = parseCsvRows(text, simMode);
+        if (!text.trim().startsWith('<!DOCTYPE') && !text.trim().startsWith('<html')) {
+          loadedRecords = parseCsvRows(text, simMode);
+        }
       }
-    } catch (err) {
-      console.warn('Error fetching via CSV URL:', err);
+    } catch {
+      // Fallback silently to simulated data
     }
   }
 
