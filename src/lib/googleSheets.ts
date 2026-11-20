@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { PosRecord, PROMO_CONFIG, CategoryType } from './promoConfig';
 
-export type SimMode = 'MAYOR_50' | 'TOTAL_SIM' | 'SEMANAS';
+export type SimMode = 'MAYOR_65' | 'MAYOR_50' | 'TOTAL_SIM' | 'SEMANAS';
 
 // Cache memory storage with timestamp
 interface SheetCache {
@@ -86,6 +86,8 @@ export function calculateSims(
   const semTotal = sem1 + sem2 + sem3 + sem4 + sem5;
 
   switch (mode) {
+    case 'MAYOR_65':
+      return mayor50;
     case 'TOTAL_SIM': {
       const sum = mayor50 + menor50;
       return sum > 0 ? sum : semTotal;

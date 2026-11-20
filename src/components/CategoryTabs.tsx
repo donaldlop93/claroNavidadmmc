@@ -69,10 +69,10 @@ export function CategoryTabs() {
             <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
                 <span className="text-[11px] uppercase tracking-wider font-semibold text-slate-400 block">
-                  Meta SIM Cards
+                  Meta SIMs (&gt; C$65)
                 </span>
                 <span className="text-sm sm:text-base font-extrabold text-slate-800">
-                  {current.targetSim} SIMs activadas
+                  {current.targetSim} SIMs (&gt; C$65)
                 </span>
               </div>
               <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold">

@@ -161,7 +161,7 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
                 </h3>
                 <p className="text-xs text-slate-900 mt-1 font-medium">
                   {isTaeDone
-                    ? `No dejés perder tus premios: solo te faltan ${missingSim} SIM Cards para entrar al sorteo oficial.`
+                    ? `No dejés perder tus premios: solo te faltan ${missingSim} SIM Cards (> C$65) para entrar al sorteo oficial.`
                     : `No dejés perder tus premios: solo te faltan ${formatCordobas(missingTae)} en TAE para entrar al sorteo oficial.`}
                 </p>
               </div>
@@ -290,7 +290,7 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
                 <div className="flex items-center gap-1.5">
                   <span className="text-base">💳</span>
                   <span className="text-xs sm:text-sm font-bold text-slate-800">
-                    Avance SIM Cards Activadas
+                    Avance SIM Cards (&gt; C$65)
                   </span>
                 </div>
                 <span
@@ -323,12 +323,12 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
               {/* Details & Pace */}
               <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1">
                 <div className="text-slate-600">
-                  Actual: <strong className="text-slate-900">{simActual} SIMs</strong> / Meta:{' '}
-                  <span className="text-slate-700">{targetSim} SIMs</span>
+                  Actual: <strong className="text-slate-900">{simActual} SIMs (&gt; C$65)</strong> / Meta:{' '}
+                  <span className="text-slate-700">{targetSim} SIMs (&gt; C$65)</span>
                 </div>
                 <div className="font-semibold text-slate-700">
                   {missingSim > 0 ? (
-                    <span className="text-red-700">Faltan: {missingSim} SIMs</span>
+                    <span className="text-red-700">Faltan: {missingSim} SIMs (&gt; C$65)</span>
                   ) : (
                     <span className="text-emerald-700 font-bold">¡Meta SIM Cumplida! ✓</span>
                   )}
@@ -342,7 +342,7 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
                   <span>
                     Ritmo sugerido:{' '}
                     <strong className="text-amber-700 font-bold">
-                      activar 1 SIM cada {simFrequencyDays} {simFrequencyDays === 1 ? 'día' : 'días'}
+                      activar 1 SIM (&gt; C$65) cada {simFrequencyDays} {simFrequencyDays === 1 ? 'día' : 'días'}
                     </strong>{' '}
                     para asegurar la meta.
                   </span>

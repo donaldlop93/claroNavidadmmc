@@ -117,7 +117,7 @@ export function getWhatsAppOrderUrl(record: PosRecord): string {
   } else {
     const missingTae = Math.max(0, catConfig.targetTae - record.taeActual);
     const missingSim = Math.max(0, catConfig.targetSim - record.simActual);
-    text = `Hola Cristian Rojas, soy el POS ${posClean} (${record.cliente}). Estoy en Categoría ${record.categoria} del Reto Navideño y me faltan ${formatCordobas(missingTae)} en TAE y ${missingSim} SIM Cards para clasificar. Quiero hacer un pedido.`;
+    text = `Hola Cristian Rojas, soy el POS ${posClean} (${record.cliente}). Estoy en Categoría ${record.categoria} del Reto Navideño y me faltan ${formatCordobas(missingTae)} en TAE y ${missingSim} SIM Cards (> C$65) para clasificar. Quiero hacer un pedido.`;
   }
 
   return `https://wa.me/${PROMO_CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`;
