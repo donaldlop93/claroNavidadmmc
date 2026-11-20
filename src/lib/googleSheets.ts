@@ -14,19 +14,28 @@ let memoryCache: SheetCache | null = null;
 const CACHE_TTL_MS = 60 * 1000; // 60 seconds controlled cache
 
 /**
- * Sanitizes and cleans currency string (e.g., "C$ 12,345.67" -> 12345.67)
+ * Sanitizes and cleans currency string (e.g., "C$ 12,345.67", "3558,18", "48,86")
  */
 export function parseCurrency(value: string | number | undefined | null): number {
   if (value === undefined || value === null) return 0;
   if (typeof value === 'number') return isNaN(value) ? 0 : value;
 
-  // Remove C$, $, spaces, commas
-  const cleaned = String(value)
-    .replace(/[C\$c\$\s]/g, '')
-    .replace(/,/g, '')
-    .trim();
+  let str = String(value).replace(/[C\$c\$\s]/g, '').trim();
+  if (!str) return 0;
 
-  const num = parseFloat(cleaned);
+  // Handle format like 1.234,56 (dot thousands, comma decimals)
+  if (str.includes('.') && str.includes(',')) {
+    if (str.lastIndexOf(',') > str.lastIndexOf('.')) {
+      str = str.replace(/\./g, '').replace(',', '.');
+    } else {
+      str = str.replace(/,/g, '');
+    }
+  } else if (str.includes(',')) {
+    // Single comma format like 3558,18 or 48,86
+    str = str.replace(',', '.');
+  }
+
+  const num = parseFloat(str);
   return isNaN(num) ? 0 : num;
 }
 
@@ -34,11 +43,7 @@ export function parseCurrency(value: string | number | undefined | null): number
  * Safely parses numeric value
  */
 export function parseNumber(value: string | number | undefined | null): number {
-  if (value === undefined || value === null) return 0;
-  if (typeof value === 'number') return isNaN(value) ? 0 : value;
-  const cleaned = String(value).replace(/,/g, '').trim();
-  const num = parseFloat(cleaned);
-  return isNaN(num) ? 0 : num;
+  return parseCurrency(value);
 }
 
 /**
@@ -57,22 +62,40 @@ export function calculateSims(
   row: Record<string, string | number>,
   mode: SimMode
 ): number {
-  const mayor50 = parseNumber(row['MAYOR C$50'] ?? row['MAYOR_50'] ?? row['M'] ?? 0);
-  const menor50 = parseNumber(row['MENOR C$50'] ?? row['MENOR_50'] ?? row['N'] ?? 0);
+  const mayor50 = parseNumber(
+    row['MAYOR C$50'] ??
+      row['MAYOR C$65'] ??
+      row['MAYOR_50'] ??
+      row['MAYOR_65'] ??
+      row['M'] ??
+      0
+  );
+  const menor50 = parseNumber(
+    row['MENOR C$50'] ??
+      row['MENOR C$65'] ??
+      row['MENOR_50'] ??
+      row['MENOR_65'] ??
+      row['N'] ??
+      0
+  );
   const sem1 = parseNumber(row['SEMANA 1'] ?? row['H'] ?? 0);
   const sem2 = parseNumber(row['SEMANA 2'] ?? row['I'] ?? 0);
   const sem3 = parseNumber(row['SEMANA 3'] ?? row['J'] ?? 0);
   const sem4 = parseNumber(row['SEMANA 4'] ?? row['K'] ?? 0);
   const sem5 = parseNumber(row['SEMANA 5'] ?? row['L'] ?? 0);
+  const semTotal = sem1 + sem2 + sem3 + sem4 + sem5;
 
   switch (mode) {
-    case 'TOTAL_SIM':
-      return mayor50 + menor50;
+    case 'TOTAL_SIM': {
+      const sum = mayor50 + menor50;
+      return sum > 0 ? sum : semTotal;
+    }
     case 'SEMANAS':
-      return sem1 + sem2 + sem3 + sem4 + sem5;
+      return semTotal;
     case 'MAYOR_50':
     default:
-      return mayor50;
+      // If mayor is defined and > 0, use it; otherwise fallback to accumulated weekly SIMs
+      return mayor50 > 0 ? mayor50 : semTotal;
   }
 }
 
@@ -359,8 +382,21 @@ function parseCsvRows(csvText: string, simMode: SimMode): PosRecord[] {
   const lines = csvText.split(/\r?\n/).filter((l) => l.trim().length > 0);
   if (lines.length < 2) return [];
 
-  // Parse header line respecting quotes
+  // Auto-detect delimiter: TSV (\t), Semicolon (;), or CSV (,)
+  const firstLine = lines[0];
+  let delimiter = ',';
+  if (firstLine.includes('\t')) {
+    delimiter = '\t';
+  } else if (firstLine.includes(';') && !firstLine.includes(',')) {
+    delimiter = ';';
+  }
+
+  // Parse line respecting quotes and chosen delimiter
   const parseLine = (line: string): string[] => {
+    if (delimiter === '\t') {
+      return line.split('\t').map((c) => c.replace(/^["']|["']$/g, '').trim());
+    }
+
     const result: string[] = [];
     let cur = '';
     let inQuote = false;
@@ -373,7 +409,7 @@ function parseCsvRows(csvText: string, simMode: SimMode): PosRecord[] {
         } else {
           inQuote = !inQuote;
         }
-      } else if (c === ',' && !inQuote) {
+      } else if (c === delimiter && !inQuote) {
         result.push(cur.trim());
         cur = '';
       } else {
