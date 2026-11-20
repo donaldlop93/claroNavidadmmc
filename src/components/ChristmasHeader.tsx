@@ -12,7 +12,7 @@ export function ChristmasHeader() {
           <div className="relative inline-flex items-center">
             {/* Santa Hat SVG positioned over Claro logo */}
             <span
-              className="absolute -top-3 -right-2 w-7 h-7 pointer-events-none transform rotate-12 z-10 drop-shadow-sm"
+              className="absolute -top-3.5 -right-2.5 w-7 h-7 pointer-events-none transform rotate-12 z-20 drop-shadow-sm"
               title="Navidad Claro"
             >
               <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
@@ -30,15 +30,15 @@ export function ChristmasHeader() {
               </svg>
             </span>
 
-            {/* Claro Official Logo */}
-            <div className="h-8 sm:h-9 w-20 sm:w-24 relative flex items-center">
+            {/* Claro Official 3D Sphere Logo */}
+            <div className="h-9 sm:h-10 w-9 sm:w-10 relative flex items-center justify-center">
               <Image
                 src="/logos/claro-logo.png"
                 alt="Claro Nicaragua"
-                width={100}
-                height={36}
+                width={44}
+                height={44}
                 priority
-                className="object-contain h-full w-auto"
+                className="object-contain h-full w-full drop-shadow-xs"
               />
             </div>
           </div>
@@ -61,13 +61,13 @@ export function ChristmasHeader() {
             </span>
           </div>
 
-          <div className="h-8 sm:h-9 w-8 sm:w-9 relative flex items-center justify-center rounded-lg bg-slate-50 border border-slate-200/80 p-0.5 overflow-hidden shadow-xs">
+          <div className="h-9 sm:h-10 w-9 sm:w-10 relative flex items-center justify-center rounded-full bg-slate-50 border border-slate-200/80 p-0.5 overflow-hidden shadow-xs">
             <Image
               src="/logos/mm-comunicaciones.png"
               alt="M&M Comunicaciones S.A."
-              width={36}
-              height={36}
-              className="object-contain h-full w-auto"
+              width={44}
+              height={44}
+              className="object-contain h-full w-full"
             />
           </div>
         </div>
