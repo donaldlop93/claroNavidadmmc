@@ -56,46 +56,23 @@ export function normalizePos(pos: string | number | undefined | null): string {
 }
 
 /**
- * Calculates SIM cards according to selected mode
+ * Calculates SIM cards: reads directly Column M (MAYOR C$65)
  */
 export function calculateSims(
   row: Record<string, string | number>,
-  mode: SimMode
+  _mode?: SimMode
 ): number {
-  const mayor50 = parseNumber(
-    row['MAYOR C$50'] ??
-      row['MAYOR C$65'] ??
-      row['MAYOR_50'] ??
+  // Strictly read Column M (MAYOR C$65)
+  const mayor65 = parseNumber(
+    row['MAYOR C$65'] ??
+      row['MAYOR C$50'] ??
       row['MAYOR_65'] ??
+      row['MAYOR_50'] ??
       row['M'] ??
       0
   );
-  const menor50 = parseNumber(
-    row['MENOR C$50'] ??
-      row['MENOR C$65'] ??
-      row['MENOR_50'] ??
-      row['MENOR_65'] ??
-      row['N'] ??
-      0
-  );
-  const sem1 = parseNumber(row['SEMANA 1'] ?? row['H'] ?? 0);
-  const sem2 = parseNumber(row['SEMANA 2'] ?? row['I'] ?? 0);
-  const sem3 = parseNumber(row['SEMANA 3'] ?? row['J'] ?? 0);
-  const sem4 = parseNumber(row['SEMANA 4'] ?? row['K'] ?? 0);
-  const sem5 = parseNumber(row['SEMANA 5'] ?? row['L'] ?? 0);
-  const semTotal = sem1 + sem2 + sem3 + sem4 + sem5;
 
-  switch (mode) {
-    case 'SEMANAS':
-      return semTotal;
-    case 'TOTAL_SIM':
-      return mayor50 + menor50;
-    case 'MAYOR_65':
-    case 'MAYOR_50':
-    default:
-      // Directly read column MAYOR C$65 (column M)
-      return mayor50;
-  }
+  return mayor65;
 }
 
 /**
