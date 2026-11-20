@@ -86,18 +86,15 @@ export function calculateSims(
   const semTotal = sem1 + sem2 + sem3 + sem4 + sem5;
 
   switch (mode) {
-    case 'MAYOR_65':
-      return mayor50;
-    case 'TOTAL_SIM': {
-      const sum = mayor50 + menor50;
-      return sum > 0 ? sum : semTotal;
-    }
     case 'SEMANAS':
       return semTotal;
+    case 'TOTAL_SIM':
+      return mayor50 + menor50;
+    case 'MAYOR_65':
     case 'MAYOR_50':
     default:
-      // If mayor is defined and > 0, use it; otherwise fallback to accumulated weekly SIMs
-      return mayor50 > 0 ? mayor50 : semTotal;
+      // Directly read column MAYOR C$65 (column M)
+      return mayor50;
   }
 }
 
@@ -122,8 +119,10 @@ export function parseRowToRecord(
   }
   const categoria = rawCat as CategoryType;
 
-  const rawTae = rowObj['TAE'] ?? rowObj['O'];
-  const taeActual = parseCurrency(rawTae);
+  const rawTae = parseCurrency(rowObj['TAE'] ?? rowObj['O']);
+  // Convert from USD to Cordobas (tipo de cambio oficial 36.6243)
+  const exchangeRate = parseFloat(process.env.EXCHANGE_RATE || '36.6243');
+  const taeActual = Math.round(rawTae * exchangeRate * 100) / 100;
   const simActual = calculateSims(rowObj, simMode);
 
   return {
@@ -535,7 +534,7 @@ export async function getPdrData(): Promise<{ records: PosRecord[]; classifiedCo
 
   const sheetId = process.env.GOOGLE_SHEET_ID || '14lONUMysN2Zhh295ahKEcIi3FAtKSncGf0lfaUPG58';
   const tabName = process.env.GOOGLE_SHEET_TAB || 'TAE KPI';
-  const simMode = (process.env.SIM_CALCULATION_MODE as SimMode) || 'MAYOR_50';
+  const simMode = (process.env.SIM_CALCULATION_MODE as SimMode) || 'MAYOR_65';
   const saEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const saKey = process.env.GOOGLE_PRIVATE_KEY;
   const apiKey = process.env.GOOGLE_API_KEY;
