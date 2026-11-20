@@ -104,7 +104,76 @@ export function formatCordobas(amount: number): string {
 }
 
 /**
- * Generates WhatsApp URL pre-filled message
+ * Generates official formatted WhatsApp message for sending directly to the client/PDR
+ */
+export function getClientWhatsAppShareMessage(record: PosRecord, webUrl?: string): string {
+  const catConfig = PROMO_CONFIG.categories[record.categoria] || PROMO_CONFIG.categories.B;
+  const targetTae = catConfig.targetTae;
+  const targetSim = catConfig.targetSim;
+  const pctTae = Math.min(100, Math.round((record.taeActual / targetTae) * 100));
+  const pctSim = Math.min(100, Math.round((record.simActual / targetSim) * 100));
+
+  const missingTae = Math.max(0, targetTae - record.taeActual);
+  const missingSim = Math.max(0, targetSim - record.simActual);
+  const isClassified = record.taeActual >= targetTae && record.simActual >= targetSim;
+
+  const daysLeft = Math.max(1, getRemainingDays());
+  const dailyTae = missingTae > 0 ? missingTae / daysLeft : 0;
+  const simFreq = missingSim > 0 ? Math.max(1, Math.floor(daysLeft / missingSim)) : 0;
+
+  const posClean = record.pos.padStart(8, '0');
+  const prizesList = catConfig.prizes.map((p) => `🎁 ${p}`).join('\n');
+
+  let statusSection = '';
+  if (isClassified) {
+    statusSection = `🎉 *¡FELICIDADES! ESTÁS 100% CLASIFICADO(A)*\nCumpliste ambas metas y tu boleto virtual está asegurado para el sorteo navideño. 🏆✨\n`;
+  } else {
+    statusSection = `⚠️ *LO QUE TE FALTA PARA CLASIFICAR:*
+👉 *En TAE:* Te faltan ${formatCordobas(missingTae)} (Ritmo: ~${formatCordobas(dailyTae)} / día)
+👉 *En SIMs (> C$65):* Te faltan ${missingSim} SIMs (Activar 1 cada ${simFreq} ${simFreq === 1 ? 'día' : 'días'})\n`;
+  }
+
+  const link = webUrl || `https://claronavidadmmc.vercel.app?pos=${posClean}`;
+  const urlSection = `\n📲 *Consultá tu avance interactivo en vivo aquí:*\n${link}\n`;
+
+  return `🎄 *EL RETO NAVIDEÑO CLARO 2026* 🎄
+*M&M Comunicaciones S.A.* — Distribuidor Autorizado
+
+Estimado(a) *${record.cliente}*, te compartimos el avance oficial de tu Punto de Venta:
+
+📍 *Código POS:* ${posClean}
+⭐ *Categoría:* ${record.categoria}
+⏳ *Días restantes:* ${daysLeft} días para el cierre (31 Dic 2026)
+
+📊 *ESTADO DE TUS METAS:*
+📱 *TAE:* ${formatCordobas(record.taeActual)} de ${formatCordobas(targetTae)} (*${pctTae}%*)
+💳 *SIMs (> C$65):* ${record.simActual} de ${targetSim} SIMs (*${pctSim}%*)
+
+${statusSection}
+🏆 *PREMIOS DE TU CATEGORÍA (${record.categoria}):*
+${prizesList}
+
+🗓️ *Sorteo Electrónico:* 15 de enero de 2027
+${urlSection}
+¡No dejés perder tus premios de Zona Norte! 🎅✨`;
+}
+
+/**
+ * Generates WhatsApp URL pre-filled for sending directly to the client/PDR
+ */
+export function getClientWhatsAppShareUrl(
+  record: PosRecord,
+  webUrl?: string,
+  clientPhone?: string
+): string {
+  const message = getClientWhatsAppShareMessage(record, webUrl);
+  const cleanPhone = clientPhone ? clientPhone.replace(/\D/g, '') : '';
+  const baseUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : `https://api.whatsapp.com/send`;
+  return `${baseUrl}?text=${encodeURIComponent(message)}`;
+}
+
+/**
+ * Generates WhatsApp URL pre-filled message for Cristian Rojas orders
  */
 export function getWhatsAppOrderUrl(record: PosRecord): string {
   const catConfig = PROMO_CONFIG.categories[record.categoria] || PROMO_CONFIG.categories.B;

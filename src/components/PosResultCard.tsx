@@ -7,6 +7,8 @@ import {
   formatCordobas,
   getRemainingDays,
   getWhatsAppOrderUrl,
+  getClientWhatsAppShareMessage,
+  getClientWhatsAppShareUrl,
 } from '@/lib/promoConfig';
 import { ConfettiCelebration } from './ConfettiCelebration';
 
@@ -16,7 +18,11 @@ interface PosResultCardProps {
 }
 
 export function PosResultCard({ record, onReset }: PosResultCardProps) {
-  const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedMessage, setCopiedMessage] = useState(false);
+  const [clientPhone, setClientPhone] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
+
   const catConfig = PROMO_CONFIG.categories[record.categoria] || PROMO_CONFIG.categories.B;
 
   const targetTae = catConfig.targetTae;
@@ -48,11 +54,27 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
   const isInactive = record.estado === 'INACTIVO';
   const isSimInactive = record.activandoSim === 'INACTIVO';
 
-  const waUrl = getWhatsAppOrderUrl(record);
+  const currentWebUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}?pos=${record.pos.padStart(8, '0')}`
+      : `https://claronavidadmmc.vercel.app?pos=${record.pos.padStart(8, '0')}`;
 
-  // Share link handler
-  const handleShare = async () => {
-    const url = typeof window !== 'undefined' ? window.location.href : '';
+  const waUrl = getWhatsAppOrderUrl(record);
+  const clientWaMessage = getClientWhatsAppShareMessage(record, currentWebUrl);
+
+  // Normalize client phone (prepend 505 for Nicaragua if 8 digits)
+  const normalizedClientPhone = () => {
+    const digits = clientPhone.replace(/\D/g, '');
+    if (!digits) return '';
+    if (digits.length === 8) return `505${digits}`;
+    return digits;
+  };
+
+  const clientWaUrl = getClientWhatsAppShareUrl(record, currentWebUrl, normalizedClientPhone());
+
+  // Share web link
+  const handleShareLink = async () => {
+    const url = currentWebUrl;
     const title = `Avance Reto Navideño Claro - POS ${record.pos}`;
     const text = `Consulta el avance del POS ${record.pos} (${record.cliente}) en el Reto Navideño Claro 2026.`;
 
@@ -68,10 +90,23 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
     if (navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2500);
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 2500);
       } catch {
         // Ignore clipboard failure
+      }
+    }
+  };
+
+  // Copy full formatted WhatsApp message to clipboard
+  const handleCopyMessage = async () => {
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(clientWaMessage);
+        setCopiedMessage(true);
+        setTimeout(() => setCopiedMessage(false), 2500);
+      } catch {
+        // Fallback
       }
     }
   };
@@ -108,21 +143,33 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
               </p>
             </div>
 
-            {/* Quick action buttons: Share & Change POS */}
-            <div className="flex items-center gap-2 self-start sm:self-center">
+            {/* Quick action buttons: WhatsApp to Client, Copy Link, Change POS */}
+            <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-center">
+              <a
+                href={clientWaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold shadow-xs transition-all active:scale-95"
+                title="Enviar reporte completo con avance y premios al cliente por WhatsApp"
+              >
+                <span>📲</span>
+                <span>Enviar por WA</span>
+              </a>
+
               <button
                 type="button"
-                onClick={handleShare}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium border border-white/20 transition-all active:scale-95"
+                onClick={handleShareLink}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium border border-white/20 transition-all active:scale-95"
+                title="Copiar enlace de consulta directa"
               >
-                <span>{copied ? '✅' : '🔗'}</span>
-                <span>{copied ? '¡Copiado!' : 'Compartir'}</span>
+                <span>{copiedLink ? '✅' : '🔗'}</span>
+                <span>{copiedLink ? '¡Copiado!' : 'Enlace'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={onReset}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-medium border border-red-400/40 transition-all active:scale-95"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-medium border border-red-400/40 transition-all active:scale-95"
               >
                 <span>🔍</span>
                 <span>Otro POS</span>
@@ -346,6 +393,88 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
                     </strong>{' '}
                     para asegurar la meta.
                   </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Section: Direct Share to Client via WhatsApp */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 border border-emerald-300 shadow-xs space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">📲</span>
+                <div>
+                  <h4 className="text-sm sm:text-base font-extrabold text-slate-800 flex items-center gap-1.5">
+                    <span>Enviar Reporte al Cliente por WhatsApp</span>
+                    <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-full bg-emerald-600 text-white">
+                      Oficial
+                    </span>
+                  </h4>
+                  <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">
+                    Envía a <strong>{record.cliente}</strong> su avance en TAE y SIMs (&gt; C$65), ritmo diario y la lista completa de premios de Categoría {record.categoria}.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Optional Client Phone Input */}
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                Número de WhatsApp del cliente (opcional):
+              </label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-500">
+                    🇳🇮 +505
+                  </span>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    placeholder="8888 8888 (o dejar vacío para elegir contacto en WhatsApp)"
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                    className="w-full pl-20 pr-3 py-2 text-xs sm:text-sm font-semibold text-slate-800 bg-white border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-emerald-500 shadow-inner"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Main Action: Send to Client WhatsApp */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <a
+                href={clientWaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 px-3 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98]"
+              >
+                <span>📲</span>
+                <span>Enviar al WhatsApp del Cliente</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={handleCopyMessage}
+                className="py-2.5 px-3 rounded-lg bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all active:scale-[0.98]"
+              >
+                <span>{copiedMessage ? '✅' : '📋'}</span>
+                <span>{copiedMessage ? '¡Mensaje Copiado!' : 'Copiar Texto Completo'}</span>
+              </button>
+            </div>
+
+            {/* Toggle Preview */}
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => setShowPreview(!showPreview)}
+                className="text-[11px] text-emerald-800 hover:text-emerald-950 font-bold underline cursor-pointer inline-flex items-center gap-1"
+              >
+                <span>{showPreview ? '▲ Ocultar vista previa del mensaje' : '👁️ Ver vista previa del mensaje a enviar'}</span>
+              </button>
+
+              {showPreview && (
+                <div className="mt-2 p-3 bg-white/95 rounded-lg border border-emerald-200 text-slate-800 text-[11px] leading-relaxed whitespace-pre-line font-mono select-all shadow-inner">
+                  {clientWaMessage}
                 </div>
               )}
             </div>
