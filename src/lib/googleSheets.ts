@@ -1,5 +1,12 @@
 import crypto from 'crypto';
-import { PosRecord, PROMO_CONFIG, CategoryType } from './promoConfig';
+import {
+  PosRecord,
+  CategoryType,
+  DepartmentType,
+  ZoneType,
+  normalizeDepartment,
+  getDepartmentCategoryMeta,
+} from './promoConfig';
 
 export type SimMode = 'MAYOR_65' | 'MAYOR_50' | 'TOTAL_SIM' | 'SEMANAS';
 
@@ -102,6 +109,17 @@ export function parseRowToRecord(
   const taeActual = Math.round(rawTae * exchangeRate * 100) / 100;
   const simActual = calculateSims(rowObj, simMode);
 
+  const sucursalRaw = String(rowObj['SUCURSAL'] ?? rowObj['F'] ?? '').trim();
+  const departamento = normalizeDepartment(sucursalRaw);
+  const zona: ZoneType =
+    departamento === 'GRANADA' ||
+    departamento === 'MASAYA' ||
+    departamento === 'CARAZO' ||
+    departamento === 'RIVAS'
+      ? 'Zona Suroriente'
+      : 'Zona Norte';
+  const sucursal = sucursalRaw || departamento;
+
   return {
     pos,
     cliente,
@@ -110,6 +128,9 @@ export function parseRowToRecord(
     categoria,
     taeActual,
     simActual,
+    sucursal,
+    departamento,
+    zona,
   };
 }
 
@@ -126,6 +147,9 @@ const FALLBACK_POS_DATA: PosRecord[] = [
     categoria: 'B',
     taeActual: 21500.0,
     simActual: 4,
+    sucursal: 'JINOTEGA',
+    departamento: 'JINOTEGA',
+    zona: 'Zona Norte',
   },
   {
     pos: '03325009',
@@ -135,6 +159,9 @@ const FALLBACK_POS_DATA: PosRecord[] = [
     categoria: 'C',
     taeActual: 7200.0,
     simActual: 6,
+    sucursal: 'JINOTEGA',
+    departamento: 'JINOTEGA',
+    zona: 'Zona Norte',
   },
   {
     pos: '84472889',
@@ -144,6 +171,9 @@ const FALLBACK_POS_DATA: PosRecord[] = [
     categoria: 'A',
     taeActual: 62450.0,
     simActual: 15,
+    sucursal: 'JINOTEGA',
+    departamento: 'JINOTEGA',
+    zona: 'Zona Norte',
   },
   {
     pos: '84123456',
@@ -153,159 +183,57 @@ const FALLBACK_POS_DATA: PosRecord[] = [
     categoria: 'B',
     taeActual: 22100.0,
     simActual: 9,
+    sucursal: 'SÉBACO',
+    departamento: 'SEBACO',
+    zona: 'Zona Norte',
   },
   {
     pos: '83921004',
-    cliente: 'COMERCIAL SAN ANTONIO - MATAGALPA',
+    cliente: 'COMERCIAL GRANADA CENTRO',
     estado: 'ACTIVO',
     activandoSim: 'ACTIVO',
     categoria: 'A',
-    taeActual: 51200.0,
-    simActual: 14,
+    taeActual: 61200.0,
+    simActual: 13,
+    sucursal: 'GRANADA',
+    departamento: 'GRANADA',
+    zona: 'Zona Suroriente',
   },
   {
     pos: '82441991',
-    cliente: 'FARMACIA SAN MARTÍN - JINOTEGA',
+    cliente: 'FARMACIA SAN MARTÍN - MASAYA',
     estado: 'ACTIVO',
     activandoSim: 'ACTIVO',
     categoria: 'B',
-    taeActual: 20550.0,
-    simActual: 7,
-  },
-  {
-    pos: '81092345',
-    cliente: 'PULPERÍA LA ESPERANZA',
-    estado: 'INACTIVO',
-    activandoSim: 'INACTIVO',
-    categoria: 'B',
-    taeActual: 9500.0,
-    simActual: 2,
+    taeActual: 21550.0,
+    simActual: 8,
+    sucursal: 'MASAYA',
+    departamento: 'MASAYA',
+    zona: 'Zona Suroriente',
   },
   {
     pos: '85661201',
-    cliente: 'MULTISERVICIOS Y CELL JALAPA',
+    cliente: 'MULTISERVICIOS Y CELL GRANADA',
     estado: 'ACTIVO',
     activandoSim: 'ACTIVO',
     categoria: 'C',
-    taeActual: 6850.0,
+    taeActual: 5850.0,
     simActual: 5,
+    sucursal: 'GRANADA',
+    departamento: 'GRANADA',
+    zona: 'Zona Suroriente',
   },
   {
     pos: '87994321',
-    cliente: 'ABARROTERÍA CENTRAL OCOTAL',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'A',
-    taeActual: 59100.0,
-    simActual: 13,
-  },
-  {
-    pos: '86112233',
-    cliente: 'CYBER Y RECARGAS EL CHAVAL',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'B',
-    taeActual: 20400.0,
-    simActual: 8,
-  },
-  {
-    pos: '88234567',
-    cliente: 'MINISÚPER LA FE - ESTELÍ',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'A',
-    taeActual: 60100.0,
-    simActual: 12,
-  },
-  {
-    pos: '89345678',
-    cliente: 'COMUNICACIONES EL DIAMANTE',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'B',
-    taeActual: 21200.0,
-    simActual: 10,
-  },
-  {
-    pos: '84556677',
-    cliente: 'FARMACIA GUADALUPE - SOMOTO',
+    cliente: 'ABARROTERÍA CENTRAL MASAYA',
     estado: 'ACTIVO',
     activandoSim: 'ACTIVO',
     categoria: 'C',
-    taeActual: 7100.0,
-    simActual: 6,
-  },
-  {
-    pos: '85778899',
-    cliente: 'DISTRIBUIDORA SAN FRANCISCO',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'A',
-    taeActual: 65400.0,
-    simActual: 14,
-  },
-  {
-    pos: '86889900',
-    cliente: 'VARIEDADES MARILYN',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'B',
-    taeActual: 20900.0,
-    simActual: 8,
-  },
-  {
-    pos: '87112244',
-    cliente: 'PULPERÍA EL TRIUNFO - PANTASMA',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'C',
-    taeActual: 6700.0,
+    taeActual: 6900.0,
     simActual: 5,
-  },
-  {
-    pos: '88334455',
-    cliente: 'SUPERMERCADO FAMILIAR SAN JOSÉ',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'A',
-    taeActual: 58900.0,
-    simActual: 12,
-  },
-  {
-    pos: '89556688',
-    cliente: 'CELL PHONE EXPRESS JINOTEGA',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'B',
-    taeActual: 21800.0,
-    simActual: 9,
-  },
-  {
-    pos: '83114477',
-    cliente: 'TIENDA Y RECARGAS LA PROVIDENCIA',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'C',
-    taeActual: 6950.0,
-    simActual: 7,
-  },
-  {
-    pos: '82998811',
-    cliente: 'LIBRERÍA Y COMUNICACIONES EL ÉXITO',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'A',
-    taeActual: 63200.0,
-    simActual: 13,
-  },
-  {
-    pos: '81776655',
-    cliente: 'PULPERÍA MI ESPERANZA - MATIGUÁS',
-    estado: 'ACTIVO',
-    activandoSim: 'ACTIVO',
-    categoria: 'B',
-    taeActual: 20350.0,
-    simActual: 8,
+    sucursal: 'MASAYA',
+    departamento: 'MASAYA',
+    zona: 'Zona Suroriente',
   },
 ];
 
@@ -490,9 +418,8 @@ async function fetchViaGoogleApi(
  */
 export function calculateClassifiedCount(records: PosRecord[]): number {
   return records.filter((r) => {
-    const config = PROMO_CONFIG.categories[r.categoria];
-    if (!config) return false;
-    return r.taeActual >= config.targetTae && r.simActual >= config.targetSim;
+    const meta = getDepartmentCategoryMeta(r.departamento, r.categoria);
+    return r.taeActual >= meta.targetTae && r.simActual >= meta.targetSim;
   }).length;
 }
 

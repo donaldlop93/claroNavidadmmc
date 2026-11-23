@@ -1,4 +1,6 @@
 export type CategoryType = 'A' | 'B' | 'C';
+export type DepartmentType = 'JINOTEGA' | 'SEBACO' | 'GRANADA' | 'MASAYA' | 'CARAZO' | 'RIVAS';
+export type ZoneType = 'Zona Norte' | 'Zona Suroriente';
 
 export interface CategoryPromoInfo {
   category: CategoryType;
@@ -9,11 +11,134 @@ export interface CategoryPromoInfo {
   prizes: string[];
 }
 
+export interface DepartmentConfig {
+  code: DepartmentType;
+  displayName: string;
+  zone: ZoneType;
+  categories: Record<CategoryType, {
+    targetTae: number;
+    targetSim: number;
+  }>;
+  prizes: Record<CategoryType, string[]>;
+}
+
+// Official Prizes for Zona Norte (Jinotega y Sébaco)
+const PRIZES_NORTE: Record<CategoryType, string[]> = {
+  A: [
+    '10 giftcards La Colonia de C$10,000',
+    '1 refrigeradora Cetron 11 pies, 2 puertas',
+    '3 microondas Frigidaire 0.6 ft³, blanco',
+    '1 cocina de gas Murcia Plus, 4 quemadores',
+    '1 televisor TCL 55" LED 4K UHD 55V6C',
+  ],
+  B: [
+    '8 giftcards La Colonia de C$10,000',
+    '4 licuadoras Black + Decker 1.65 L, rojas',
+    '3 cafeteras Black + Decker, 12 tazas, blancas',
+    '4 planchas TELSTAR',
+    '1 televisor TCL 32" QLED FHD',
+  ],
+  C: [
+    '4 giftcards Walmart de C$3,662.43 cada una',
+  ],
+};
+
+// Official Prizes for Zona Suroriente (Granada, Masaya, Carazo, Rivas)
+const PRIZES_SURORIENTE: Record<CategoryType, string[]> = {
+  A: [
+    'GiftCards de Supermercado',
+    'Refrigeradora de 2 puertas',
+    'Cocina de gas de 4 quemadores',
+    'Microondas',
+    'Televisor Smart TV 4K UHD',
+  ],
+  B: [
+    'GiftCards de Supermercado',
+    'Licuadoras de alta capacidad',
+    'Cafeteras eléctricas de 12 tazas',
+    'Planchas de vapor',
+    'Televisor FHD',
+  ],
+  C: [
+    'GiftCards de Supermercado para compras navideñas',
+  ],
+};
+
+// Metas oficiales por Departamento y Categoría
+export const DEPARTMENT_CONFIGS: Record<DepartmentType, DepartmentConfig> = {
+  JINOTEGA: {
+    code: 'JINOTEGA',
+    displayName: 'Jinotega',
+    zone: 'Zona Norte',
+    categories: {
+      A: { targetTae: 58418.66, targetSim: 12 },
+      B: { targetTae: 20298.00, targetSim: 8 },
+      C: { targetTae: 6613.90, targetSim: 5 },
+    },
+    prizes: PRIZES_NORTE,
+  },
+  SEBACO: {
+    code: 'SEBACO',
+    displayName: 'Sébaco',
+    zone: 'Zona Norte',
+    categories: {
+      A: { targetTae: 58418.66, targetSim: 12 },
+      B: { targetTae: 20298.00, targetSim: 8 },
+      C: { targetTae: 6613.90, targetSim: 5 },
+    },
+    prizes: PRIZES_NORTE,
+  },
+  GRANADA: {
+    code: 'GRANADA',
+    displayName: 'Granada',
+    zone: 'Zona Suroriente',
+    categories: {
+      A: { targetTae: 60365.00, targetSim: 12 },
+      B: { targetTae: 20266.04, targetSim: 8 },
+      C: { targetTae: 5565.06, targetSim: 5 },
+    },
+    prizes: PRIZES_SURORIENTE,
+  },
+  MASAYA: {
+    code: 'MASAYA',
+    displayName: 'Masaya',
+    zone: 'Zona Suroriente',
+    categories: {
+      A: { targetTae: 61023.00, targetSim: 12 },
+      B: { targetTae: 20952.55, targetSim: 8 },
+      C: { targetTae: 6843.83, targetSim: 5 },
+    },
+    prizes: PRIZES_SURORIENTE,
+  },
+  CARAZO: {
+    code: 'CARAZO',
+    displayName: 'Carazo',
+    zone: 'Zona Suroriente',
+    categories: {
+      A: { targetTae: 63565.00, targetSim: 12 },
+      B: { targetTae: 21402.30, targetSim: 8 },
+      C: { targetTae: 6712.12, targetSim: 5 },
+    },
+    prizes: PRIZES_SURORIENTE,
+  },
+  RIVAS: {
+    code: 'RIVAS',
+    displayName: 'Rivas',
+    zone: 'Zona Suroriente',
+    categories: {
+      A: { targetTae: 55603.00, targetSim: 12 },
+      B: { targetTae: 20805.05, targetSim: 8 },
+      C: { targetTae: 5999.84, targetSim: 5 },
+    },
+    prizes: PRIZES_SURORIENTE,
+  },
+};
+
 export const PROMO_CONFIG = {
-  name: 'EL RETO NAVIDEÑO CLARO 2026 — ZONA NORTE',
+  name: 'EL RETO NAVIDEÑO CLARO 2026',
   distributor: 'M&M Comunicaciones S.A.',
   distributorSubtitle: 'Distribuidor Autorizado de Claro Nicaragua',
-  zone: 'Zona Norte',
+  zones: ['Zona Norte', 'Zona Suroriente'] as ZoneType[],
   startDate: new Date('2026-11-01T00:00:00-06:00'),
   endDate: new Date('2026-12-31T23:59:59-06:00'),
   drawDate: '15 de enero de 2027',
@@ -26,13 +151,7 @@ export const PROMO_CONFIG = {
       badgeColor: 'bg-amber-500 text-white',
       targetTae: 58418.66,
       targetSim: 12,
-      prizes: [
-        '10 giftcards La Colonia de C$10,000',
-        '1 refrigeradora Cetron 11 pies, 2 puertas',
-        '3 microondas Frigidaire 0.6 ft³, blanco',
-        '1 cocina de gas Murcia Plus, 4 quemadores',
-        '1 televisor TCL 55" LED 4K UHD 55V6C',
-      ],
+      prizes: PRIZES_NORTE.A,
     },
     B: {
       category: 'B',
@@ -40,13 +159,7 @@ export const PROMO_CONFIG = {
       badgeColor: 'bg-blue-600 text-white',
       targetTae: 20298.0,
       targetSim: 8,
-      prizes: [
-        '8 giftcards La Colonia de C$10,000',
-        '4 licuadoras Black + Decker 1.65 L, rojas',
-        '3 cafeteras Black + Decker, 12 tazas, blancas',
-        '4 planchas TELSTAR',
-        '1 televisor TCL 32" QLED FHD',
-      ],
+      prizes: PRIZES_NORTE.B,
     },
     C: {
       category: 'C',
@@ -54,9 +167,7 @@ export const PROMO_CONFIG = {
       badgeColor: 'bg-emerald-600 text-white',
       targetTae: 6613.9,
       targetSim: 5,
-      prizes: [
-        '4 giftcards Walmart de C$3,662.43 cada una',
-      ],
+      prizes: PRIZES_NORTE.C,
     },
   } as Record<CategoryType, CategoryPromoInfo>,
 };
@@ -69,6 +180,9 @@ export interface PosRecord {
   categoria: CategoryType;
   taeActual: number;
   simActual: number;
+  sucursal: string;
+  departamento: DepartmentType;
+  zona: ZoneType;
 }
 
 export interface ConsultaResponse {
@@ -79,8 +193,48 @@ export interface ConsultaResponse {
 }
 
 /**
+ * Normalizes sucursal text to DepartmentType
+ */
+export function normalizeDepartment(rawSucursal?: string | null): DepartmentType {
+  if (!rawSucursal) return 'JINOTEGA';
+  const clean = String(rawSucursal).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  if (clean.includes('GRANADA')) return 'GRANADA';
+  if (clean.includes('MASAYA')) return 'MASAYA';
+  if (clean.includes('CARAZO')) return 'CARAZO';
+  if (clean.includes('RIVAS')) return 'RIVAS';
+  if (clean.includes('SEBACO')) return 'SEBACO';
+  return 'JINOTEGA';
+}
+
+/**
+ * Gets specific target goals and prizes based on Department and Category
+ */
+export function getDepartmentCategoryMeta(
+  department: DepartmentType | string,
+  category: CategoryType
+): {
+  targetTae: number;
+  targetSim: number;
+  prizes: string[];
+  displayName: string;
+  zone: ZoneType;
+} {
+  const deptKey = normalizeDepartment(department);
+  const deptConfig = DEPARTMENT_CONFIGS[deptKey] || DEPARTMENT_CONFIGS.JINOTEGA;
+  const catConfig = deptConfig.categories[category] || deptConfig.categories.B;
+  const prizes = deptConfig.prizes[category] || deptConfig.prizes.B;
+
+  return {
+    targetTae: catConfig.targetTae,
+    targetSim: catConfig.targetSim,
+    prizes,
+    displayName: deptConfig.displayName,
+    zone: deptConfig.zone,
+  };
+}
+
+/**
  * Calculates remaining days until campaign closing (Dec 31, 2026).
- * Minimum return is 1 to avoid division by zero.
  */
 export function getRemainingDays(now: Date = new Date()): number {
   const end = PROMO_CONFIG.endDate.getTime();
@@ -107,9 +261,9 @@ export function formatCordobas(amount: number): string {
  * Generates official formatted WhatsApp message for sending directly to the client/PDR
  */
 export function getClientWhatsAppShareMessage(record: PosRecord, webUrl?: string): string {
-  const catConfig = PROMO_CONFIG.categories[record.categoria] || PROMO_CONFIG.categories.B;
-  const targetTae = catConfig.targetTae;
-  const targetSim = catConfig.targetSim;
+  const meta = getDepartmentCategoryMeta(record.departamento, record.categoria);
+  const targetTae = meta.targetTae;
+  const targetSim = meta.targetSim;
   const pctTae = Math.min(100, Math.round((record.taeActual / targetTae) * 100));
   const pctSim = Math.min(100, Math.round((record.simActual / targetSim) * 100));
 
@@ -122,7 +276,7 @@ export function getClientWhatsAppShareMessage(record: PosRecord, webUrl?: string
   const simFreq = missingSim > 0 ? Math.max(1, Math.floor(daysLeft / missingSim)) : 0;
 
   const posClean = record.pos.padStart(8, '0');
-  const prizesList = catConfig.prizes.map((p) => `🎁 ${p}`).join('\n');
+  const prizesList = meta.prizes.map((p) => `🎁 ${p}`).join('\n');
 
   let statusSection = '';
   if (isClassified) {
@@ -142,6 +296,7 @@ export function getClientWhatsAppShareMessage(record: PosRecord, webUrl?: string
 Estimado(a) *${record.cliente}*, te compartimos el avance oficial de tu Punto de Venta:
 
 📍 *Código POS:* ${posClean}
+🏢 *Departamento:* ${meta.displayName} (${meta.zone})
 ⭐ *Categoría:* ${record.categoria}
 ⏳ *Días restantes:* ${daysLeft} días para el cierre (31 Dic 2026)
 
@@ -150,12 +305,12 @@ Estimado(a) *${record.cliente}*, te compartimos el avance oficial de tu Punto de
 💳 *SIMs (> C$65):* ${record.simActual} de ${targetSim} SIMs (*${pctSim}%*)
 
 ${statusSection}
-🏆 *PREMIOS DE TU CATEGORÍA (${record.categoria}):*
+🏆 *PREMIOS DE TU CATEGORÍA (${record.categoria}) EN ${meta.zone.toUpperCase()}:*
 ${prizesList}
 
 🗓️ *Sorteo Electrónico:* 15 de enero de 2027
 ${urlSection}
-¡No dejés perder tus premios de Zona Norte! 🎅✨`;
+¡No dejés perder tus premios navideños! 🎅✨`;
 }
 
 /**
@@ -176,17 +331,17 @@ export function getClientWhatsAppShareUrl(
  * Generates WhatsApp URL pre-filled message for Cristian Rojas orders
  */
 export function getWhatsAppOrderUrl(record: PosRecord): string {
-  const catConfig = PROMO_CONFIG.categories[record.categoria] || PROMO_CONFIG.categories.B;
-  const isClassified = record.taeActual >= catConfig.targetTae && record.simActual >= catConfig.targetSim;
+  const meta = getDepartmentCategoryMeta(record.departamento, record.categoria);
+  const isClassified = record.taeActual >= meta.targetTae && record.simActual >= meta.targetSim;
   const posClean = record.pos.padStart(8, '0');
 
   let text = '';
   if (isClassified) {
-    text = `Hola Cristian Rojas, soy el POS ${posClean} (${record.cliente}). Ya cumplí mi meta del Reto Navideño (Categoría ${record.categoria}) y quiero hacer un nuevo pedido de saldo/SIMs.`;
+    text = `Hola Cristian Rojas, soy el POS ${posClean} (${record.cliente}) de ${meta.displayName}. Ya cumplí mi meta del Reto Navideño (Categoría ${record.categoria}) y quiero hacer un nuevo pedido de saldo/SIMs.`;
   } else {
-    const missingTae = Math.max(0, catConfig.targetTae - record.taeActual);
-    const missingSim = Math.max(0, catConfig.targetSim - record.simActual);
-    text = `Hola Cristian Rojas, soy el POS ${posClean} (${record.cliente}). Estoy en Categoría ${record.categoria} del Reto Navideño y me faltan ${formatCordobas(missingTae)} en TAE y ${missingSim} SIM Cards (> C$65) para clasificar. Quiero hacer un pedido.`;
+    const missingTae = Math.max(0, meta.targetTae - record.taeActual);
+    const missingSim = Math.max(0, meta.targetSim - record.simActual);
+    text = `Hola Cristian Rojas, soy el POS ${posClean} (${record.cliente}) de ${meta.displayName}. Estoy en Categoría ${record.categoria} del Reto Navideño y me faltan ${formatCordobas(missingTae)} en TAE y ${missingSim} SIM Cards (> C$65) para clasificar. Quiero hacer un pedido.`;
   }
 
   return `https://wa.me/${PROMO_CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`;

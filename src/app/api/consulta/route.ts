@@ -3,8 +3,7 @@ import { findPosRecord, getPdrData } from '@/lib/googleSheets';
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const pos = searchParams.get('pos');
+    const pos = request.nextUrl.searchParams.get('pos');
 
     // Case 1: No POS query param provided -> Return classified count only
     if (!pos) {
@@ -61,7 +60,10 @@ export async function GET(request: NextRequest) {
         },
       }
     );
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.digest?.startsWith?.('NEXT_') || error?.message?.includes?.('bail out of prerendering')) {
+      throw error;
+    }
     console.error('API Error in /api/consulta:', error);
     return NextResponse.json(
       {

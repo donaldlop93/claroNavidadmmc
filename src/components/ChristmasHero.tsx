@@ -73,11 +73,11 @@ export function ChristmasHero({ classifiedCount }: ChristmasHeroProps) {
             </span>
           </div>
 
-          {/* Social Proof: Zona Norte Classified */}
+          {/* Social Proof: Classified PDRs */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/95 text-slate-900 text-xs sm:text-sm font-bold shadow-md">
             <span className="text-amber-900">⭐</span>
             <span>
-              <strong className="text-slate-950 font-black">{classifiedCount} PDR</strong> clasificados en Zona Norte
+              <strong className="text-slate-950 font-black">{classifiedCount} PDR</strong> clasificados oficialmente
             </span>
           </div>
         </div>
@@ -89,7 +89,7 @@ export function ChristmasHero({ classifiedCount }: ChristmasHeroProps) {
 
         {/* Subtitle */}
         <p className="mt-2 text-red-100 text-xs sm:text-sm md:text-base font-normal max-w-lg leading-relaxed">
-          Consulta oficial de avance de metas TAE y SIM Cards en <span className="font-semibold text-white">Zona Norte</span>.
+          Consulta oficial de avance de metas TAE y SIM Cards en <span className="font-semibold text-white">Zona Norte y Suroriente</span>.
           ¡Cumplí tus dos metas antes del 31 de diciembre y entrá al sorteo de fabulosos premios!
         </p>
 

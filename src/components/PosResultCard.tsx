@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import {
   PosRecord,
-  PROMO_CONFIG,
   formatCordobas,
   getRemainingDays,
   getWhatsAppOrderUrl,
   getClientWhatsAppShareMessage,
   getClientWhatsAppShareUrl,
+  getDepartmentCategoryMeta,
 } from '@/lib/promoConfig';
 import { ConfettiCelebration } from './ConfettiCelebration';
 
@@ -23,10 +23,10 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
   const [clientPhone, setClientPhone] = useState('');
   const [showPreview, setShowPreview] = useState(false);
 
-  const catConfig = PROMO_CONFIG.categories[record.categoria] || PROMO_CONFIG.categories.B;
+  const meta = getDepartmentCategoryMeta(record.departamento, record.categoria);
 
-  const targetTae = catConfig.targetTae;
-  const targetSim = catConfig.targetSim;
+  const targetTae = meta.targetTae;
+  const targetSim = meta.targetSim;
 
   const taeActual = record.taeActual;
   const simActual = record.simActual;
@@ -139,7 +139,7 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
                 {record.cliente.toLowerCase()}
               </h2>
               <p className="text-xs text-slate-300 mt-0.5">
-                Cartera M&M Comunicaciones S.A. • Zona Norte
+                Cartera M&M Comunicaciones S.A. • 📍 {meta.displayName} ({meta.zone})
               </p>
             </div>
 
@@ -190,7 +190,7 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
                 </h3>
                 <p className="text-xs text-emerald-100 mt-1">
                   Tu Punto de Venta ya tiene su boleto virtual asegurado para el sorteo del <strong>15 de enero de 2027</strong>.
-                  ¡Mantené tu ritmo para continuar liderando la Zona Norte!
+                  ¡Mantené tu ritmo para continuar liderando en {meta.displayName} ({meta.zone})!
                 </p>
               </div>
             </div>
@@ -239,7 +239,7 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
                   Reto Navideño en marcha
                 </h3>
                 <p className="text-[11px] sm:text-xs text-slate-600 mt-0.5">
-                  Seguí las recomendaciones de ritmo diario para asegurar tu participación en el sorteo de Zona Norte.
+                  Seguí las recomendaciones de ritmo diario para asegurar tu participación en el sorteo de {meta.zone} ({meta.displayName}).
                 </p>
               </div>
             </div>
@@ -507,12 +507,12 @@ export function PosResultCard({ record, onReset }: PosResultCardProps) {
                 <span>Premios en Sorteo para tu Categoría ({record.categoria})</span>
               </h3>
               <span className="text-[11px] font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded">
-                Exclusivo Zona Norte
+                Exclusivo {meta.zone} ({meta.displayName})
               </span>
             </div>
 
             <div className="grid grid-cols-1 gap-2">
-              {catConfig.prizes.map((prize, idx) => (
+              {meta.prizes.map((prize, idx) => (
                 <div
                   key={idx}
                   className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 flex items-center gap-2"
