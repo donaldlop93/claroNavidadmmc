@@ -209,7 +209,7 @@ function MainContent() {
       <footer className="mt-auto border-t border-slate-200 bg-white py-6 px-4 text-center text-xs text-slate-500">
         <div className="max-w-2xl mx-auto space-y-2">
           <p className="font-semibold text-slate-700">
-            El Reto Navideño Claro 2026 • Zona Norte & Suroriente (Jinotega, Sébaco, Granada, Masaya)
+            El Reto Navideño Claro 2026 • Red de Puntos de Recarga (PDR)
           </p>
           <p>
             M&M Comunicaciones S.A. — Distribuidor Autorizado de Claro Nicaragua

@@ -43,10 +43,10 @@ export function ChristmasHeader() {
             </div>
           </div>
 
-          {/* Region Badge */}
+          {/* Badge */}
           <div className="hidden xs:flex sm:flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-700 text-[11px] sm:text-xs font-semibold">
             <span>🎄</span>
-            <span>Norte & Suroriente</span>
+            <span>Promoción Navideña 2026</span>
           </div>
         </div>
 

@@ -257,11 +257,38 @@ export function formatCordobas(amount: number): string {
   );
 }
 
+export interface ExecutiveContact {
+  name: string;
+  phone: string;
+  displayPhone: string;
+}
+
+/**
+ * Returns official executive contact based on zone:
+ * Norte (Jinotega, Sébaco) -> Cristian Rojas (84480260)
+ * Suroriente (Granada, Masaya, Carazo, Rivas) -> Leonel Gaitán (83359575)
+ */
+export function getExecutiveForZone(zone: ZoneType): ExecutiveContact {
+  if (zone === 'Zona Suroriente') {
+    return {
+      name: 'Leonel Gaitán',
+      phone: '50583359575',
+      displayPhone: '+505 8335-9575',
+    };
+  }
+  return {
+    name: 'Cristian Rojas',
+    phone: '50584480260',
+    displayPhone: '+505 8448-0260',
+  };
+}
+
 /**
  * Generates official formatted WhatsApp message for sending directly to the client/PDR
  */
 export function getClientWhatsAppShareMessage(record: PosRecord, webUrl?: string): string {
   const meta = getDepartmentCategoryMeta(record.departamento, record.categoria);
+  const executive = getExecutiveForZone(meta.zone);
   const targetTae = meta.targetTae;
   const targetSim = meta.targetSim;
   const pctTae = Math.min(100, Math.round((record.taeActual / targetTae) * 100));
@@ -296,7 +323,7 @@ export function getClientWhatsAppShareMessage(record: PosRecord, webUrl?: string
 Estimado(a) *${record.cliente}*, te compartimos el avance oficial de tu Punto de Venta:
 
 📍 *Código POS:* ${posClean}
-🏢 *Departamento:* ${meta.displayName} (${meta.zone})
+🏢 *Departamento:* ${meta.displayName}
 ⭐ *Categoría:* ${record.categoria}
 ⏳ *Días restantes:* ${daysLeft} días para el cierre (31 Dic 2026)
 
@@ -305,10 +332,11 @@ Estimado(a) *${record.cliente}*, te compartimos el avance oficial de tu Punto de
 💳 *SIMs (> C$65):* ${record.simActual} de ${targetSim} SIMs (*${pctSim}%*)
 
 ${statusSection}
-🏆 *PREMIOS DE TU CATEGORÍA (${record.categoria}) EN ${meta.zone.toUpperCase()}:*
+🏆 *PREMIOS DE TU CATEGORÍA (${record.categoria}):*
 ${prizesList}
 
 🗓️ *Sorteo Electrónico:* 15 de enero de 2027
+📞 *Consultar Saldo / Pedidos:* ${executive.name} (${executive.displayPhone})
 ${urlSection}
 ¡No dejés perder tus premios navideños! 🎅✨`;
 }
@@ -328,21 +356,35 @@ export function getClientWhatsAppShareUrl(
 }
 
 /**
- * Generates WhatsApp URL pre-filled message for Cristian Rojas orders
+ * Generates WhatsApp URL pre-filled message and executive info for orders / saldo
  */
-export function getWhatsAppOrderUrl(record: PosRecord): string {
+export function getWhatsAppOrderInfo(record: PosRecord): {
+  url: string;
+  executive: ExecutiveContact;
+} {
   const meta = getDepartmentCategoryMeta(record.departamento, record.categoria);
+  const executive = getExecutiveForZone(meta.zone);
   const isClassified = record.taeActual >= meta.targetTae && record.simActual >= meta.targetSim;
   const posClean = record.pos.padStart(8, '0');
 
   let text = '';
   if (isClassified) {
-    text = `Hola Cristian Rojas, soy el POS ${posClean} (${record.cliente}) de ${meta.displayName}. Ya cumplí mi meta del Reto Navideño (Categoría ${record.categoria}) y quiero hacer un nuevo pedido de saldo/SIMs.`;
+    text = `Hola ${executive.name}, soy el POS ${posClean} (${record.cliente}) de ${meta.displayName}. Ya cumplí mi meta del Reto Navideño (Categoría ${record.categoria}) y quiero consultar saldo y hacer un nuevo pedido.`;
   } else {
     const missingTae = Math.max(0, meta.targetTae - record.taeActual);
     const missingSim = Math.max(0, meta.targetSim - record.simActual);
-    text = `Hola Cristian Rojas, soy el POS ${posClean} (${record.cliente}) de ${meta.displayName}. Estoy en Categoría ${record.categoria} del Reto Navideño y me faltan ${formatCordobas(missingTae)} en TAE y ${missingSim} SIM Cards (> C$65) para clasificar. Quiero hacer un pedido.`;
+    text = `Hola ${executive.name}, soy el POS ${posClean} (${record.cliente}) de ${meta.displayName}. Estoy en Categoría ${record.categoria} del Reto Navideño y me faltan ${formatCordobas(missingTae)} en TAE y ${missingSim} SIM Cards (> C$65) para clasificar. Quiero consultar saldo y hacer un pedido.`;
   }
 
-  return `https://wa.me/${PROMO_CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`;
+  return {
+    url: `https://wa.me/${executive.phone}?text=${encodeURIComponent(text)}`,
+    executive,
+  };
+}
+
+/**
+ * Generates WhatsApp URL pre-filled message for orders (backward-compatible)
+ */
+export function getWhatsAppOrderUrl(record: PosRecord): string {
+  return getWhatsAppOrderInfo(record).url;
 }

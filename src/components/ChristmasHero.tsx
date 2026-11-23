@@ -89,7 +89,7 @@ export function ChristmasHero({ classifiedCount }: ChristmasHeroProps) {
 
         {/* Subtitle */}
         <p className="mt-2 text-red-100 text-xs sm:text-sm md:text-base font-normal max-w-lg leading-relaxed">
-          Consulta oficial de avance de metas TAE y SIM Cards en <span className="font-semibold text-white">Zona Norte y Suroriente</span>.
+          Consulta oficial de avance de metas TAE y SIM Cards para Puntos de Recarga (PDR).
           ¡Cumplí tus dos metas antes del 31 de diciembre y entrá al sorteo de fabulosos premios!
         </p>
 
