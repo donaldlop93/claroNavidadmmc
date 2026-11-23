@@ -43,24 +43,39 @@ const PRIZES_NORTE: Record<CategoryType, string[]> = {
   ],
 };
 
-// Official Prizes for Zona Suroriente (Granada, Masaya, Carazo, Rivas)
-const PRIZES_SURORIENTE: Record<CategoryType, string[]> = {
+// Official Prizes for Granada (Electrodomésticos y GiftCards según arte oficial)
+const PRIZES_GRANADA: Record<CategoryType, string[]> = {
   A: [
-    'GiftCards de Supermercado',
+    'Cocina de gas con horno',
     'Refrigeradora de 2 puertas',
-    'Cocina de gas de 4 quemadores',
-    'Microondas',
-    'Televisor Smart TV 4K UHD',
+    'Pantalla Smart TV LED',
+    'Microondas para el hogar',
+    'GiftCard de Supermercado',
   ],
   B: [
-    'GiftCards de Supermercado',
-    'Licuadoras de alta capacidad',
-    'Cafeteras eléctricas de 12 tazas',
-    'Planchas de vapor',
-    'Televisor FHD',
+    'Licuadora de alta potencia',
+    'Cafetera eléctrica de 12 tazas',
+    'Plancha de vapor',
+    'GiftCard de Supermercado',
   ],
   C: [
-    'GiftCards de Supermercado para compras navideñas',
+    'Plancha de vapor / Licuadora',
+    'GiftCard de Supermercado para compras navideñas',
+  ],
+};
+
+// Official Prizes for Masaya (SOLO GIFTCARDS de Supermercado según arte oficial)
+const PRIZES_MASAYA: Record<CategoryType, string[]> = {
+  A: [
+    'GiftCard de Supermercado (Compras navideñas de alto valor)',
+    'GiftCard de Supermercado para compras del hogar',
+  ],
+  B: [
+    'GiftCard de Supermercado (Compras navideñas)',
+    'GiftCard de Supermercado para surtido familiar',
+  ],
+  C: [
+    'GiftCard de Supermercado para compras navideñas',
   ],
 };
 
@@ -97,7 +112,7 @@ export const DEPARTMENT_CONFIGS: Record<DepartmentType, DepartmentConfig> = {
       B: { targetTae: 20266.04, targetSim: 8 },
       C: { targetTae: 5565.06, targetSim: 5 },
     },
-    prizes: PRIZES_SURORIENTE,
+    prizes: PRIZES_GRANADA,
   },
   MASAYA: {
     code: 'MASAYA',
@@ -108,7 +123,7 @@ export const DEPARTMENT_CONFIGS: Record<DepartmentType, DepartmentConfig> = {
       B: { targetTae: 20952.55, targetSim: 8 },
       C: { targetTae: 6843.83, targetSim: 5 },
     },
-    prizes: PRIZES_SURORIENTE,
+    prizes: PRIZES_MASAYA,
   },
   CARAZO: {
     code: 'CARAZO',
@@ -119,7 +134,7 @@ export const DEPARTMENT_CONFIGS: Record<DepartmentType, DepartmentConfig> = {
       B: { targetTae: 21402.30, targetSim: 8 },
       C: { targetTae: 6712.12, targetSim: 5 },
     },
-    prizes: PRIZES_SURORIENTE,
+    prizes: PRIZES_MASAYA,
   },
   RIVAS: {
     code: 'RIVAS',
@@ -130,7 +145,7 @@ export const DEPARTMENT_CONFIGS: Record<DepartmentType, DepartmentConfig> = {
       B: { targetTae: 20805.05, targetSim: 8 },
       C: { targetTae: 5999.84, targetSim: 5 },
     },
-    prizes: PRIZES_SURORIENTE,
+    prizes: PRIZES_MASAYA,
   },
 };
 
